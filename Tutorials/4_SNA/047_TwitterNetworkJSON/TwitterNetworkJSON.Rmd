@@ -22,7 +22,7 @@ library(ggraph)
 Download the file SwissPoliticians.csv and read it as a csv in R. Take into account that separators are tabs. Change the screen names of accounts to lower case and add a column with a sequential id from 1 to the number of politicians.
 
 ```{r}
-poldf <- read.csv("SwissPoliticians.csv",sep="\t",header=TRUE, stringsAsFactors=FALSE)
+poldf <- read.csv("C:/Users/manth/GitHub/SocialDataScience/Exercises/04_Assortativity_Twitter/SwissPoliticians.csv",sep="\t",header=TRUE, stringsAsFactors=FALSE)
 poldf$screenName <- tolower(poldf$screenName)
 poldf$id <- seq(1, nrow(poldf))
 ```
@@ -30,7 +30,7 @@ poldf$id <- seq(1, nrow(poldf))
 Read the politician tweets file taking into account that it is compressed. Print a random line and its content read as JSON. Check Exercise 2 (SIT on Twitter) if you need an example of how to do this.
 
 ```{r}
-lines <- readLines(gzfile("SwissPoliticians-tweets.json.gz"))
+lines <- readLines(gzfile("C:/Users/manth/GitHub/SocialDataScience/Exercises/04_Assortativity_Twitter/SwissPoliticians-tweets.json.gz"))
 line <- lines[sample(length(lines), 1)]
 line
 fromJSON(line)

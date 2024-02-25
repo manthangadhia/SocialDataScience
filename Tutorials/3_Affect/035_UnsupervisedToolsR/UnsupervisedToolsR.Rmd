@@ -60,6 +60,7 @@ get_vader("This book is not bad")
 The vader package also includes a vader_df() function to run VADER over a series of texts and produce results in a data frame. Here we use the schrute library to load the scripts of the US TV series "The Office" and run VADER over the first six lines of the series:
 
 ```{r}
+install.packages("schrute")
 library(schrute)
 texts <- head(theoffice$text)
 vader_df(texts)
@@ -260,13 +261,14 @@ Something about 0.75 is not so strong given that these two measurements should b
 
 You can use off-the-shelf state-of-the-art sentiment analysis models based on the Transformers architecture (which ChatGPT uses). You need to install the reticulate package, which allows you to install a way to use python code within R called miniconda. You only need to run this install_miniconda once and it will be set up.
 ```{r, eval=F}
-install.packages("reticulate")
+# install.packages("reticulate")
 library(reticulate)
-install_miniconda()
+# install_miniconda()
 ```
 
 Once you have that set up, you can install the latest version of the huggingfaceR package, which lets you use models stored in the HuggingFace repository. To set up this link to HuggingFace, you need to run hf_python_depends() to download dependencies within Python, so you can just focus on your R code.
 ```{r, eval=F}
+install.packages("devtools")
 devtools::install_github("farach/huggingfaceR")
 library(huggingfaceR)
 hf_python_depends() 

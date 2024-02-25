@@ -46,28 +46,31 @@ reslist[[1]]
 Now make a search with your own term and asking for a limit of 100 results instead of 10. Save the list from the JSON as we did above to have the information on each subreddit.
 
 ```{r onesearch, eval=F}
-searchresults <- GET( #Your code here
+searchresults <- GET(  'https://www.reddit.com/subreddits/search.json?limit=100&q=john%20oliver'
   , accept_json())
 searchjson <- content(searchresults, type="application/json")
 reslist <- searchjson$data$children
 ```
-
 
 **1.3 Select subreddits**
 
 Iterate over the search results to create a data frame called "subredditsdf" that contains the names of each subreddit (display_name) and the number of subscribers (subscribers). Then filter that data frame to have only subreddits with at least 1000 subscribers.
 ```{r search, eval=F}
 library(dplyr)
-subredditsdf <- NULL
+subredditsdf <- data.frame(subreddit = character(), subscribers = numeric())
 for (i in seq(1, length(reslist)))
 {
-  subredditsdf <- rbind(subredditsdf, 
-                        data.frame(
-                          subreddit=reslist[[i]]$data$display_name, 
-                          subscribers=reslist[[i]]$data$subscribers))
+if (length(reslist[[i]]$data) > 0 && !is.null(reslist[[i]]$data$display_name) && !is.null(reslist[[i]]$data$subscribers)) {
+    subredditsdf <- rbind(subredditsdf,
+                          data.frame(
+                            subreddit = reslist[[i]]$data$display_name,
+                            subscribers = reslist[[i]]$data$subscribers))
+  }
 }
 
 # Your code here to filter subreddits with less than 1000 subscribers. Save the result in subredditsdf
+
+subredditsdf <- subredditsdf[subredditsdf$subscribers >= 1000, ]
 ```
 
 If less than 50 subreddits remain after filtering, go back to the subreddit search (1.2) and use a more frequent term for the search and repeat this task.
@@ -92,7 +95,7 @@ srlist[[1]]$data$score
 For each subreddit in your data frame, make a request for its frontpage of posts. Save the score of each post in another dataframe called "postsdf" with two columns, one with the name of the subreddit of the post and another with the score of that post. Using the function Sys.sleep, add a random waiting period between requests, for example sampled uniformly between 10 and 15 seconds. You can tell if you are making too many requests by checking if the field "error" of the json result is not NULL. In that case you can code an extra waiting period and retry to get the posts of that subreddit and continue.
 
 ```{r posts, eval=F}
-postsdf <- NULL
+postsdf <- data.frame(score = numeric(), subreddit = character())
 for (srd in subredditsdf$subreddit)
 { 
   Sys.sleep(runif(n=1,min=10,max=15))
@@ -125,6 +128,7 @@ for (srd in subredditsdf$subreddit)
 Now on the result, we want to calculate the mean score of the posts of each subreddit. Here group_by and summarise from dplyr will be helpful.
 ```{r aggregate, eval=F}
 postsdf %>% group_by(subreddit) %>% #Your code to aggregate here, save the resul int postsAggdf
+  summarise(mnScore = mean(score)) -> postsAggdf
 ```
 
 **3.3 Merge with subreddit data**
@@ -156,9 +160,10 @@ hist(log(srdf$mnScore))
 
 **4.3 Number of subscribers vs social impact**
 
-Make a scatter plot with the logarithm of the number of followers of users on the horizontal axis and the logarithm of social impact on the vertical axis. Do you guess that there is a relationship?
+Make a scatter plot with the logarithm of the number of subscribers of subreddits on the horizontal axis and the logarithm of social impact on the vertical axis. Do you guess that there is a relationship?
 ```{r ScatterPlot}
 # Your code here
+plot(log(srdf$subscribers), log(srdf$mnScore))
 ```
 
 # 5. Fit and visualize the regression model
@@ -167,12 +172,16 @@ Make a scatter plot with the logarithm of the number of followers of users on th
 
 Make two new columns on the users data frame, one called SI with the logarithm of the mean score, and another called FC with the logarithm of the number of subscribers. Use the lm function to fit a model with the SI as dependent variable and FC as independent variable. 
 ```{r fitModel}
-# Your code here
+srdf <- srdf %>% 
+          mutate(SI = log(srdf$mnScore), FC = log(srdf$subscribers))
+
+model <- lm(SI~FC, srdf)
 ```
 
 Print the values of the coefficient estimates of the model. Do these values support or contradict Social Impact Theory?
 ```{r modelCoefficients}
 # Your code here
+model$coefficients
 ```
 
 **5.2 Plot fit result**
@@ -180,6 +189,8 @@ Print the values of the coefficient estimates of the model. Do these values supp
 Plot the same scatter plot as in 3.3. Then use the abline function to draw a line of top with the intercept being the first coefficient of the model, and the slope as the second coefficient of the model. Add a second line with slope 1 and an intercept that allows you to see it in the range of the plot. Which slope do you think is closer to the slope you see in the scatter plot?
 ```{r ModelPlot}
 # Your code here
+plot(srdf$FC, srdf$SI, xlab="FC", ylab="Social impact")
+abline(model$coefficients[1], model$coefficients[2], col="red")
 ```
 
 **5.3 Calculate quality of the fit**

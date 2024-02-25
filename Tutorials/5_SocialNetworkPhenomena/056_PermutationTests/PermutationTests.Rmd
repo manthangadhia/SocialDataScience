@@ -17,6 +17,9 @@ We can answer this questions with a permutation test. A permutation test has fou
 4. A **permutation set** with $N$ random permutations or shuffles of the data. Permutations in this set model a world in which the null hypothesis is true and any measurement different than the one specified in the null hypothesis is due to chance alone. $N$ should be relatively large so we have an idea of the range of values of the test statistic when it is produced only by chance.
 
 ### Permutation tests in R
+```{r, eval=F}
+install.packages("gtrendsR")
+```
 
 ```{r echo=F, message=F, results='hide', cache=TRUE}
 library(WDI)

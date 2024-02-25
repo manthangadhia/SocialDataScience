@@ -108,7 +108,7 @@ Now we can run the classifier over this resulting matrix and have an idea of its
 results = predict(models[[1]], testmatrix)
 table(trueclass, results)
 ```
-Seems that when a tweet is predicted as angry, it has high changes to be truly angry, but tweets predicted as not angry might be both angry and not. We can measure this better if we calculate accuracy, precision, and recall:
+Seems that when a tweet is predicted as angry, it has high chances to be truly angry, but tweets predicted as not angry might be both angry and not. We can measure this better if we calculate accuracy, precision, and recall:
 
 ```{r }
 #Accuracy Anger
@@ -125,6 +125,10 @@ As you see, the precision is high but the recall is low. The model has learned w
 # 5. Comparing with dictionary methods
 
 The code below uses a similar approach as what you can find in the [unsupervised sentiment analysis tutorial](https://dgarcia-eu.github.io/SocialDataScience/3_Affect/035_UnsupervisedToolsR/UnsupervisedToolsR.html). We use tidytext to process the data and to match words with the entries of the NRC emotion dictionary, which is distributed through tidytext. We classify a tweet as angry if it contains at least one word from the dictionary and measure the accuracy, precision, and recall of this approach:
+```{r}
+install.packages("tidytext")
+install.packages("textdata")
+```
 
 ```{r }
 library(tidytext)
